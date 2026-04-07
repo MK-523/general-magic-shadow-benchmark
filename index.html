@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shadow Mode Insurance Agent Benchmark</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">General Magic concept build</p>
+          <h1>Shadow Mode Insurance SMS Agent Benchmark</h1>
+          <p class="lede">
+            A product demo for testing whether an insurance messaging agent should
+            automate, ask follow-up questions, or escalate to a human before a
+            broker ever notices a broken workflow.
+          </p>
+          <div class="hero-actions">
+            <button id="run-all" class="primary">Run full benchmark</button>
+            <button id="shuffle-scenario" class="secondary">
+              Load random scenario
+            </button>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <span class="stat-label">Scenarios</span>
+            <strong id="scenario-count">0</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Autonomous pass rate</span>
+            <strong id="pass-rate">0%</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Avg. confidence</span>
+            <strong id="avg-confidence">0%</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <aside class="scenario-panel glass">
+          <div class="panel-heading">
+            <p class="eyebrow">Benchmark set</p>
+            <h2>Servicing scenarios</h2>
+          </div>
+          <div id="scenario-list" class="scenario-list"></div>
+        </aside>
+
+        <section class="workbench">
+          <div class="top-grid">
+            <article class="glass conversation-card">
+              <div class="panel-heading">
+                <p class="eyebrow">Customer thread</p>
+                <h2 id="scenario-title">Select a scenario</h2>
+              </div>
+              <div id="message-thread" class="message-thread"></div>
+            </article>
+
+            <article class="glass decision-card">
+              <div class="panel-heading">
+                <p class="eyebrow">Shadow decision</p>
+                <h2>Agent output</h2>
+              </div>
+              <div class="decision-summary">
+                <div>
+                  <span class="meta-label">Recommended action</span>
+                  <strong id="decision-action">-</strong>
+                </div>
+                <div>
+                  <span class="meta-label">Confidence</span>
+                  <strong id="decision-confidence">-</strong>
+                </div>
+                <div>
+                  <span class="meta-label">Intent</span>
+                  <strong id="decision-intent">-</strong>
+                </div>
+              </div>
+              <div class="meter-wrap">
+                <div class="meter-track">
+                  <div id="confidence-meter" class="meter-fill"></div>
+                </div>
+              </div>
+              <div class="decision-block">
+                <span class="meta-label">Why this action</span>
+                <p id="decision-rationale"></p>
+              </div>
+              <div class="decision-block">
+                <span class="meta-label">Outbound SMS draft</span>
+                <p id="decision-reply" class="reply-draft"></p>
+              </div>
+            </article>
+          </div>
+
+          <div class="bottom-grid">
+            <article class="glass details-card">
+              <div class="panel-heading">
+                <p class="eyebrow">Structured extraction</p>
+                <h2>CRM / BMS writeback</h2>
+              </div>
+              <div class="chip-row" id="flags-row"></div>
+              <pre id="writeback-payload" class="payload-block"></pre>
+            </article>
+
+            <article class="glass replay-card">
+              <div class="panel-heading">
+                <p class="eyebrow">Counterfactual replay</p>
+                <h2>Change one fact</h2>
+              </div>
+              <label class="field-label" for="replay-select">Scenario variant</label>
+              <select id="replay-select"></select>
+              <div id="replay-description" class="replay-description"></div>
+              <div class="replay-comparison">
+                <div>
+                  <span class="meta-label">Original</span>
+                  <p id="original-outcome"></p>
+                </div>
+                <div>
+                  <span class="meta-label">Replayed</span>
+                  <p id="replayed-outcome"></p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <article class="glass eval-card">
+            <div class="panel-heading">
+              <p class="eyebrow">Benchmark results</p>
+              <h2>Policy-safe automation scorecard</h2>
+            </div>
+            <div class="eval-overview">
+              <div>
+                <span class="meta-label">Action accuracy</span>
+                <strong id="action-accuracy">0%</strong>
+              </div>
+              <div>
+                <span class="meta-label">Payload accuracy</span>
+                <strong id="payload-accuracy">0%</strong>
+              </div>
+              <div>
+                <span class="meta-label">Escalation precision</span>
+                <strong id="escalation-accuracy">0%</strong>
+              </div>
+            </div>
+            <div id="eval-table" class="eval-table"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
