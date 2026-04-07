@@ -2,17 +2,17 @@
 
 Insurance-focused shadow-mode benchmark harness for quote, claim, policy update, and renewal conversations.
 
-## What's in there
+## What's there in here
 
 - A scenario library for quote / claim / policy update / renewal flows
 - A mock insurance SMS agent with workflow state and structured actions
-- A synthetic user simulator
-- An evaluator that separates deterministic workflow checks from agentic Gemini judgment
+- one synthetic user simulator
+- An evaluator that separates deterministic workflow checks from agentic judgment of the situation
 - A batch runner that logs every conversation to `runs/latest.jsonl`
-- A Streamlit dashboard to inspect metrics and transcripts
+- A Streamlit dashboard to look at metrics and transcripts
 - Optional Google AI Studio / Gemini-backed agent and judge adapters so you can benchmark real model behavior instead of only rules
-- Optional Anthropic Claude-backed agent and judge adapters so you can avoid Gemini free-tier limits
-- Optional Ollama-backed local open models so you can run without external API usage
+- Optional Anthropic Claude-backed agent and judge adapters
+- Optional Ollama-backed local open models so you can run without excessive API usage
 - Provider comparison views and brokerage-ops KPIs such as deflection, manual review rate, and structured completion
 
 ## Project layout
@@ -51,10 +51,9 @@ python3 -m benchmark.batch_runner --limit 1
 Useful mode flags:
 
 ```bash
-# Agent only, no judge
 python3 -m benchmark.batch_runner --scenario quote-auto-multi-driver --agent-only
 
-# Judge only on top of the mock agent
+#judge on top of mock agent
 python3 -m benchmark.batch_runner --scenario quote-auto-multi-driver --judge-only
 ```
 
@@ -77,9 +76,9 @@ export CLAUDE_AGENT_MODEL=claude-sonnet-4-20250514
 export CLAUDE_JUDGE_MODEL=claude-sonnet-4-20250514
 ```
 
-## Run with local open models via Ollama
+## Run with local open models using Ollama
 
-Start Ollama and pull a model first, for example:
+Start Ollama and pull a model first:
 
 ```bash
 ollama pull qwen2.5:14b-instruct
@@ -98,7 +97,7 @@ python3 -m benchmark.batch_runner --scenario policy-update-address --no-variants
 streamlit run streamlit_app.py
 ```
 
-## Run with Google AI Studio-backed agent and judge
+## run with google ai studio agent
 
 The Gemini integrations use the official Google GenAI SDK with structured JSON outputs. By default they are off.
 
@@ -120,28 +119,15 @@ export GEMINI_AGENT_MODEL=gemini-2.5-flash
 export GEMINI_JUDGE_MODEL=gemini-2.5-flash
 ```
 
-If you are on the Gemini free tier, the benchmark can hit quota quickly because each run may make both an agent call and a judge call. Practical options:
-
-```bash
-# Slower but safer on free tier
-export GEMINI_REQUEST_DELAY_SECONDS=12.5
-
-# Or disable the judge and score only the agent with deterministic checks
-unset USE_GEMINI_JUDGE
-```
-
 ## Notes
 
-- `google-genai` and `pydantic` are included in `requirements.txt`, but the benchmark still works without setting `GEMINI_API_KEY`.
-- `anthropic` is included in `requirements.txt`, and Claude uses `ANTHROPIC_API_KEY`.
 - Ollama uses a local HTTP API by default at `http://127.0.0.1:11434` and does not require an external API key.
 - The Gemini adapters use structured JSON outputs so the agent decision and judge output come back as typed data instead of free-form text.
 - The dashboard metrics are designed around insurance operations questions General Magic would care about:
   safe deflection, structured workflow completion, correct escalation boundaries, and whether the agent creates usable system actions instead of just nice-looking replies.
-- Hard checks stay deterministic:
+- Hard checks are deterministic:
   entity coverage, writeback presence, automation eligibility, containment, and escalation-policy correctness.
 - Soft checks are agentic:
-  frustration, loop risk, hallucination risk, empathy, drop-off risk, and handoff quality come from the Gemini judge.
-- The Gemini judge now runs in two passes:
-  first it extracts concrete findings from the transcript and agent output, then it scores from those findings with evidence.
-- If the Gemini judge is off, those soft metrics are intentionally shown as not evaluated rather than filled with fake constants.
+  frustration, loop risk, hallucination risk, empathy, drop-off risk, and handoff quality come from the ai judge.
+- The judge now runs in two passes:
+  first it extracts concrete findings from the transcript and agent output, then it scores from those findings
