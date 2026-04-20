@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
@@ -23,7 +24,8 @@ from benchmark.adapters import (
     ollama_enabled,
 )
 from benchmark.evaluator import evaluate_conversation
-from benchmark.models import ConversationLog, ConversationTurn, JudgeResult, Scenario, Variant
+from benchmark.execution import execute_structured_actions
+from benchmark.models import ConversationLog, ConversationTurn, JudgeResult, Message, Scenario, Variant
 from benchmark.policy import apply_policy_guardrails
 from benchmark.scenarios import scenario_library, scenario_map
 from benchmark.simulator import SyntheticUserSimulator
@@ -36,12 +38,45 @@ def build_conversation_log(
     variant: Variant | None = None,
     judge: GeminiConversationJudge | ClaudeConversationJudge | OllamaConversationJudge | None = None,
 ) -> ConversationLog:
+    start_time = time.perf_counter()
+
     transcript = list(scenario.initial_messages)
     transcript.extend(simulator.next_turn(scenario, variant))
+
+    # first pass
+    t0 = time.perf_counter()
     raw_decision = agent.run(scenario, transcript)
+    agent_time = time.perf_counter() - t0
+
     decision, policy_assessment = apply_policy_guardrails(scenario, transcript, raw_decision, variant=variant)
+
+    # simulate follow-up turn
+    follow_up = simulator.continue_after_decision(scenario, transcript, decision, variant)
+    if follow_up:
+        transcript.append(Message("agent", decision.reply))
+        transcript.extend(follow_up)
+
+        t1 = time.perf_counter()
+        raw_decision = agent.run(scenario, transcript)
+        agent_time += time.perf_counter() - t1
+
+        decision, policy_assessment = apply_policy_guardrails(scenario, transcript, raw_decision, variant=variant)
+
+    # judge
+    t2 = time.perf_counter()
     judge_result: JudgeResult | None = judge.score(scenario, transcript, decision) if judge else None
+    judge_time = time.perf_counter() - t2
+
+    # execution simulation
+    execution_report = execute_structured_actions(scenario, decision)
+
+    # evaluation
     metrics = evaluate_conversation(scenario, transcript, decision, variant, judge_result)
+    metrics["execution_success"] = execution_report["overall_success"]
+    metrics["execution_latency_ms"] = execution_report["total_latency_ms"]
+    metrics["agent_latency_ms"] = round(agent_time * 1000, 1)
+    metrics["judge_latency_ms"] = round(judge_time * 1000, 1)
+    metrics["end_to_end_latency_ms"] = round((time.perf_counter() - start_time) * 1000, 1)
 
     turns = [ConversationTurn(speaker=message.role, text=message.text) for message in transcript]
     turns.append(
@@ -66,6 +101,7 @@ def build_conversation_log(
         "rationale": decision.rationale,
         "policy_assessment": policy_assessment,
         "structured_actions": [asdict(action) for action in decision.structured_actions],
+        "execution_report": execution_report,
     }
 
     return ConversationLog(
