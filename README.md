@@ -1,6 +1,6 @@
 # General Magic Shadow Benchmark (Upgraded)
 
-This repository is a **production-style evaluation harness for AI insurance agents**, not just a chatbot demo.
+This repository is a **production-style evaluation harness for AI insurance agents**
 
 ## What’s new
 
@@ -12,7 +12,6 @@ This repository is a **production-style evaluation harness for AI insurance agen
 
 ## What this actually measures
 
-Instead of “did the model sound good”, this answers:
 
 - Did it choose the correct workflow?
 - Did it stay within safe operational boundaries?
@@ -25,7 +24,7 @@ Instead of “did the model sound good”, this answers:
 Scenario → Simulator → Agent → Policy Guardrails → Execution → Evaluator → Dashboard
 ```
 
-## Key additions
+## Additions from before
 
 ### Execution Engine
 Simulates:
@@ -53,10 +52,10 @@ instead of deterministic routing.
 ## Why this is different
 
 Most AI benchmarks test:
-> “Can the model answer correctly?”
+> “Is the model answering correctly?”
 
 This tests:
-> “Can the system safely complete real workflows end-to-end?”
+> “Can the system safely complete full workflows from start to finish?”
 
 ## Running
 
@@ -67,12 +66,7 @@ streamlit run streamlit_app.py
 
 ## Next steps (roadmap)
 
-- richer multi-turn branching simulation
-- real API mocks instead of synthetic execution
+- better multi-turn branching simulation
+- real API mocks instead of local execution
 - adversarial scenario variants
-- cost + token tracking
 - CI regression benchmarking
-
----
-
-This repo now represents a **mini offline production environment for an AI insurance agent**, which is exactly what companies like General Magic need to validate real-world deployment.
